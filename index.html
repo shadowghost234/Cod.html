@@ -1,579 +1,87 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CALL OF WEB: MODERN WARFARE</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-        }
-
-        body {
-            background-color: #0a0c0e;
-            color: #e0e0e0;
-            overflow: hidden;
-        }
-
-        /* ================= LOBBY UI ================= */
-        #lobby {
-            position: absolute;
-            width: 100vw;
-            height: 100vh;
-            background: radial-gradient(circle at 70% 50%, #1e272e 0%, #0a0c0e 80%);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 30px 50px;
-            z-index: 10;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 15px;
-        }
-
-        .game-title {
-            font-size: 36px;
-            font-weight: 900;
-            letter-spacing: 3px;
-            color: #fff;
-            text-transform: uppercase;
-        }
-
-        .game-title span {
-            color: #f39c12;
-        }
-
-        .player-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-left: 4px solid #f39c12;
-            padding: 10px 20px;
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .level-badge {
-            background: #f39c12;
-            color: #000;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 3px;
-        }
-
-        .lobby-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 70%;
-        }
-
-        .menu-section {
-            width: 380px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .panel {
-            background: rgba(15, 20, 25, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 20px;
-            backdrop-filter: blur(5px);
-        }
-
-        .panel h3 {
-            color: #f39c12;
-            font-size: 14px;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-
-        .option-btn {
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid transparent;
-            color: #ccc;
-            text-align: left;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .option-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
-
-        .option-btn.active {
-            background: rgba(243, 156, 18, 0.2);
-            border-color: #f39c12;
-            color: #fff;
-            font-weight: bold;
-        }
-
-        /* Soldado / Preview Central */
-        .operator-preview {
-            text-align: center;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .operator-silhouette {
-            width: 220px;
-            height: 320px;
-            background: linear-gradient(180deg, rgba(243,156,18,0.15) 0%, rgba(0,0,0,0) 100%);
-            border: 1px dashed rgba(243, 156, 18, 0.4);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .operator-silhouette::before {
-            content: "OPERADOR: GHOST";
-            position: absolute;
-            top: -25px;
-            font-size: 12px;
-            letter-spacing: 2px;
-            color: #f39c12;
-        }
-
-        .weapon-stats {
-            width: 300px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .stat-bar {
-            margin: 8px 0;
-            font-size: 12px;
-        }
-
-        .bar-bg {
-            width: 100%;
-            height: 6px;
-            background: #222;
-            margin-top: 4px;
-        }
-
-        .bar-fill {
-            height: 100%;
-            background: #f39c12;
-            transition: width 0.3s;
-        }
-
-        .deploy-btn {
-            background: #f39c12;
-            color: #000;
-            font-size: 22px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            padding: 18px 40px;
-            border: none;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: 0.2s;
-            box-shadow: 0 0 20px rgba(243, 156, 18, 0.4);
-        }
-
-        .deploy-btn:hover {
-            background: #ffaa2b;
-            transform: scale(1.03);
-        }
-
-        /* ================= HUD DE JOGO ================= */
-        #hud {
-            display: none;
-            position: absolute;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        /* Mira (Crosshair) */
-        #crosshair {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 20px;
-            height: 20px;
-            transform: translate(-50%, -50%);
-        }
-
-        #crosshair::before, #crosshair::after {
-            content: '';
-            position: absolute;
-            background: rgba(0, 255, 100, 0.85);
-        }
-
-        #crosshair::before { top: 9px; left: 0; width: 20px; height: 2px; }
-        #crosshair::after { top: 0; left: 9px; width: 2px; height: 20px; }
-
-        /* Hitmarker */
-        #hitmarker {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 24px;
-            height: 24px;
-            transform: translate(-50%, -50%) rotate(45deg);
-            opacity: 0;
-            transition: opacity 0.1s;
-        }
-        #hitmarker::before, #hitmarker::after {
-            content: '';
-            position: absolute;
-            background: #ff3b3b;
-        }
-        #hitmarker::before { top: 11px; left: 0; width: 24px; height: 2px; }
-        #hitmarker::after { top: 0; left: 11px; width: 2px; height: 24px; }
-
-        .hud-top-left {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 15px;
-            border-left: 4px solid #f39c12;
-        }
-
-        .hud-bottom-left {
-            position: absolute;
-            bottom: 30px;
-            left: 30px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 15px 25px;
-            border-bottom: 3px solid #2ecc71;
-        }
-
-        .hud-bottom-right {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 15px 25px;
-            text-align: right;
-            border-bottom: 3px solid #f39c12;
-        }
-
-        .ammo-count {
-            font-size: 36px;
-            font-weight: bold;
-        }
-
-        #damage-overlay {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            box-shadow: inset 0 0 100px rgba(255, 0, 0, 0);
-            transition: box-shadow 0.2s;
-        }
-
-        #game-over {
-            display: none;
-            position: absolute;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 20;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GlobalMarket MZ - Compra e Venda</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',sans-serif}
+body{background:#eaeded;color:#333}
+header{background:#131921;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.logo{font-size:20px;font-weight:700;color:#FF9900}
+.user{display:flex;align-items:center;gap:8px;font-size:13px}
+.user img{width:32px;height:32px;border-radius:50%;border:2px solid #FF9900}
+.tabs{background:#232f3e;display:flex;gap:5px;padding:0 12px;overflow-x:auto}
+.tab-btn{background:none;border:0;color:#fff;padding:12px 14px;cursor:pointer;font-weight:500;font-size:13px;white-space:nowrap;border-bottom:3px solid transparent}
+.tab-btn.active{color:#FF9900;border-bottom-color:#FF9900}
+main{max-width:1100px;margin:20px auto;padding:0 14px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+h2{font-size:20px;margin-bottom:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.card{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;flex-direction:column}
+.card img{width:100%;height:180px;object-fit:cover;background:#eee}
+.body{padding:14px;flex:1}
+.body b{font-size:15px}
+.price{font-size:18px;font-weight:700;color:#b12704;margin:6px 0}
+.desc{font-size:13px;color:#666;line-height:1.4}
+.actions{padding:12px;border-top:1px solid #eee;display:flex;gap:8px}
+.btn{background:#FF9900;border:0;padding:10px;border-radius:6px;font-weight:600;cursor:pointer;flex:1}
+.btn2{background:#fff;border:1px solid #ccc;padding:10px;border-radius:6px;cursor:pointer;flex:1}
+.form{background:#fff;padding:22px;border-radius:10px;max-width:600px;margin:0 auto}
+.form label{display:block;margin:12px 0 5px;font-weight:600;font-size:14px}
+.form input,.form textarea,.form select{width:100%;padding:11px;border:1px solid #cbd5e0;border-radius:6px;font-size:14px}
+.box{border:2px dashed #cbd5e0;padding:12px;border-radius:6px;text-align:center;background:#f7fafc}
+#prev{width:100%;max-height:220px;object-fit:cover;border-radius:6px;display:none;margin-top:10px}
+.cartbox{background:#fff;padding:18px;border-radius:10px}
+.cartItem{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
+.cartItem img{width:60px;height:60px;object-fit:cover;border-radius:6px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#131921;color:#fff;padding:12px 20px;border-radius:8px;display:none;z-index:999}
+#login{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;justify-content:center;align-items:center;z-index:1000;padding:16px}
+.loginCard{background:#fff;padding:28px;border-radius:12px;text-align:center;max-width:380px;width:100%}
+</style>
 </head>
 <body>
-
-    <!-- LOBBY -->
-    <div id="lobby">
-        <div class="top-bar">
-            <div class="game-title">CALL OF <span>WEB</span></div>
-            <div class="player-card">
-                <div class="level-badge" id="player-rank">NVL 1</div>
-                <div>
-                    <div style="font-weight: bold;">SOLDADO_01</div>
-                    <div style="font-size: 12px; color: #aaa;">KILLS TOTAIS: <span id="total-kills">0</span></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="lobby-content">
-            <!-- Esquerda: Seleção de Arma e Mapa -->
-            <div class="menu-section">
-                <div class="panel">
-                    <h3>1. Armamento (Loadout)</h3>
-                    <button class="option-btn active" onclick="selectWeapon('m4a1', this)">
-                        <span>M4A1 (Rifle de Assalto)</span>
-                        <span>BALA</span>
-                    </button>
-                    <button class="option-btn" onclick="selectWeapon('ak47', this)">
-                        <span>AK-47 (Alto Dano)</span>
-                        <span>PESADA</span>
-                    </button>
-                    <button class="option-btn" onclick="selectWeapon('mp5', this)">
-                        <span>MP5 (Submetralhadora)</span>
-                        <span>RÁPIDA</span>
-                    </button>
-                </div>
-
-                <div class="panel">
-                    <h3>2. Zona de Combate (Mapa)</h3>
-                    <button class="option-btn active" onclick="selectMap('desert', this)">
-                        <span>DUST OUTPOST</span>
-                        <span>DESERTO</span>
-                    </button>
-                    <button class="option-btn" onclick="selectMap('night', this)">
-                        <span>BLACKOUT BASE</span>
-                        <span>NOTURNO</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Centro: Operador e Status da Arma -->
-            <div class="operator-preview">
-                <div class="operator-silhouette">
-                    <div style="font-size: 60px;">🪖</div>
-                    <div id="selected-weapon-label" style="margin-top: 15px; font-weight: bold; color: #f39c12;">M4A1 EQUIPADA</div>
-                </div>
-
-                <div class="weapon-stats">
-                    <div class="stat-bar">
-                        DANO
-                        <div class="bar-bg"><div class="bar-fill" id="stat-dmg" style="width: 65%;"></div></div>
-                    </div>
-                    <div class="stat-bar">
-                        CADÊNCIA DE TIRO
-                        <div class="bar-bg"><div class="bar-fill" id="stat-rate" style="width: 75%;"></div></div>
-                    </div>
-                    <div class="stat-bar">
-                        MUNIÇÃO PENTE
-                        <div class="bar-bg"><div class="bar-fill" id="stat-ammo" style="width: 60%;"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Direita: Controles e Iniciar -->
-            <div class="menu-section" style="justify-content: flex-end;">
-                <div class="panel">
-                    <h3>Controles</h3>
-                    <p style="font-size: 13px; line-height: 1.8; color: #bbb;">
-                        <b>W, A, S, D:</b> Mover<br>
-                        <b>MOUSE:</b> Mirar<br>
-                        <b>CLIQUE ESQ:</b> Atirar<br>
-                        <b>TECLA R:</b> Recarregar<br>
-                        <b>ESPAÇO:</b> Pular<br>
-                        <b>ESC:</b> Pausar / Voltar ao Lobby
-                    </p>
-                </div>
-                <button class="deploy-btn" onclick="startGame()">INICIAR MISSÃO</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- HUD EM JOGO -->
-    <div id="hud">
-        <div id="damage-overlay"></div>
-        <div id="crosshair"></div>
-        <div id="hitmarker"></div>
-
-        <div class="hud-top-left">
-            <div style="font-size: 12px; color: #f39c12;">OBJETIVO: ELIMINAR HOSTIS</div>
-            <div style="font-size: 22px; font-weight: bold;">KILLS: <span id="hud-kills">0</span></div>
-        </div>
-
-        <div class="hud-bottom-left">
-            <div style="font-size: 12px; color: #2ecc71;">SAÚDE DO OPERADOR</div>
-            <div style="font-size: 32px; font-weight: bold;"><span id="hud-hp">100</span>%</div>
-        </div>
-
-        <div class="hud-bottom-right">
-            <div id="hud-weapon-name" style="font-size: 14px; color: #f39c12; font-weight: bold;">M4A1</div>
-            <div class="ammo-count"><span id="hud-ammo">30</span> / <span id="hud-max-ammo" style="font-size: 20px; color: #aaa;">30</span></div>
-            <div id="reload-msg" style="color: #ff3b3b; font-size: 12px; display: none;">RECARREGANDO...</div>
-        </div>
-    </div>
-
-    <!-- TELA DE GAME OVER -->
-    <div id="game-over">
-        <h1 style="font-size: 50px; color: #ff3b3b;">K.I.A. - VOCÊ MORREU</h1>
-        <p style="font-size: 20px;">Inimigos Eliminados: <span id="final-kills" style="color: #f39c12; font-weight: bold;">0</span></p>
-        <button class="deploy-btn" onclick="returnToLobby()">VOLTAR AO LOBBY</button>
-    </div>
-
-    <!-- THREE.JS VIA CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-    <script>
-        // ================= DADOS DO LOBBY E ARMAS =================
-        const WEAPONS = {
-            m4a1: { name: "M4A1", damage: 35, fireRate: 130, ammo: 30, dmgBar: "65%", rateBar: "75%", ammoBar: "60%", color: 0x333333 },
-            ak47: { name: "AK-47", damage: 55, fireRate: 180, ammo: 25, dmgBar: "90%", rateBar: "55%", ammoBar: "50%", color: 0x5c3a21 },
-            mp5:  { name: "MP5",  damage: 25, fireRate: 85,  ammo: 40, dmgBar: "45%", rateBar: "95%", ammoBar: "85%", color: 0x1a1a1a }
-        };
-
-        let currentWeaponKey = 'm4a1';
-        let currentMap = 'desert';
-        let totalCareerKills = 0;
-
-        function selectWeapon(key, btn) {
-            currentWeaponKey = key;
-            document.querySelectorAll('.menu-section .panel:first-child .option-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            const w = WEAPONS[key];
-            document.getElementById('selected-weapon-label').innerText = w.name + " EQUIPADA";
-            document.getElementById('stat-dmg').style.width = w.dmgBar;
-            document.getElementById('stat-rate').style.width = w.rateBar;
-            document.getElementById('stat-ammo').style.width = w.ammoBar;
-        }
-
-        function selectMap(mapKey, btn) {
-            currentMap = mapKey;
-            document.querySelectorAll('.menu-section .panel:last-child .option-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
-
-        // ================= MOTOR 3D (THREE.JS) =================
-        let scene, camera, renderer, weaponMesh, muzzleFlash;
-        let isPlaying = false;
-        let playerHP = 100;
-        let matchKills = 0;
-        let currentAmmo = 30;
-        let isReloading = false;
-        let lastShotTime = 0;
-        let isMouseDown = false;
-
-        // Física e Movimento
-        const keys = {};
-        let velocityY = 0;
-        let canJump = true;
-        let yaw = 0, pitch = 0;
-
-        // Entidades
-        let enemies = [];
-        let obstacles = [];
-        let bullets = [];
-
-        // Áudio Sintetizado (Web Audio API - sem arquivos externos)
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playShootSound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.1);
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
-        }
-
-        function init3D() {
-            if (renderer) document.body.removeChild(renderer.domElement);
-
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.rotation.order = 'YXZ';
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
-
-            // Configuração do Mapa
-            if (currentMap === 'desert') {
-                scene.background = new THREE.Color(0xd4a373);
-                scene.fog = new THREE.Fog(0xd4a373, 10, 120);
-            } else {
-                scene.background = new THREE.Color(0x090d16);
-                scene.fog = new THREE.Fog(0x090d16, 5, 90);
-            }
-
-            // Luzes
-            const ambientLight = new THREE.AmbientLight(0xffffff, currentMap === 'desert' ? 0.7 : 0.3);
-            scene.add(ambientLight);
-
-            const dirLight = new THREE.DirectionalLight(0xffffff, currentMap === 'desert' ? 0.8 : 0.4);
-            dirLight.position.set(50, 100, 50);
-            scene.add(dirLight);
-
-            // Chão
-            const floorGeo = new THREE.PlaneGeometry(200, 200);
-            const floorMat = new THREE.MeshLambertMaterial({ color: currentMap === 'desert' ? 0xc2956e : 0x1e272e });
-            const floor = new THREE.Mesh(floorGeo, floorMat);
-            floor.rotation.x = -Math.PI / 2;
-            scene.add(floor);
-
-            // Obstáculos (Caixas / Muros de Cobertura)
-            obstacles = [];
-            const boxGeo = new THREE.BoxGeometry(4, 3.5, 4);
-            const boxMat = new THREE.MeshLambertMaterial({ color: currentMap === 'desert' ? 0x8d6e63 : 0x34495e });
-
-            for (let i = 0; i < 25; i++) {
-                const box = new THREE.Mesh(boxGeo, boxMat);
-                let bx = (Math.random() - 0.5) * 140;
-                let bz = (Math.random() - 0.5) * 140;
-                if (Math.abs(bx) < 10 && Math.abs(bz) < 10) bx += 15; // Não nascer em cima do jogador
-                box.position.set(bx, 1.75, bz);
-                scene.add(box);
-                obstacles.push(box);
-            }
-
-            // Arma em Primeira Pessoa
-            const wData = WEAPONS[currentWeaponKey];
-            const gunGeo = new THREE.BoxGeometry(0.12, 0.15, 0.7);
-            const gunMat = new THREE.MeshStandardMaterial({ color: wData.color });
-            weaponMesh = new THREE.Mesh(gunGeo, gunMat);
-            weaponMesh.position.set(0.25, -0.22, -0.45);
-
-            // Clarão do tiro (Muzzle Flash)
-            const flashGeo = new THREE.SphereGeometry(0.08, 8, 8);
-            const flashMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
-            muzzleFlash = new THREE.Mesh(flashGeo, flashMat);
-            muzzleFlash.position.set(0, 0.05, -0.4);
-            muzzleFlash.visible = false;
-            weaponMesh.add(muzzleFlash);
-
-            camera.add(weaponMesh);
-            scene.add(camera);
-
-            // Resetar Jogador
-            camera.position.set(0, 1.7, 0);
-            yaw = 0; pitch = 0;
-            playerHP = 100;
-            matchKills = 0;
-            currentAmmo = wData.ammo;
-            isReloading = false;
-
-            updateHUD();
-
-            // Criar Inimigos Iniciais
-            enemies = [];
-            for (let i = 0; i < 6; i++) spawnEnemy();
-        }
-
-        function spawnEnemy() {
-            const en
+<div id="toast">Feito!</div>
+<div id="login"><div class="loginCard"><h2>🛍️ GlobalMarket MZ</h2><p style="color:#666;font-size:14px;margin:10px 0 20px">Entra para comprar e vender em Mocambique.</p><button class="btn" style="width:100%;padding:12px" onclick="entrar()">Entrar com Google</button><br><br><button class="btn2" style="width:100%" onclick="fecharLogin()">Entrar como Convidado</button></div></div>
+<header><div class="logo"><i class="fa-solid fa-bag-shopping"></i> GlobalMarket MZ</div><div class="user"><span id="nomeUser">Convidado</span><img id="avatarUser" src="https://i.pravatar.cc/100"><button onclick="abrirLogin()" style="background:#232f3e;color:#fff;border:1px solid #555;padding:6px 10px;border-radius:6px;cursor:pointer">Entrar</button></div></header>
+<nav class="tabs">
+<button class="tab-btn active" onclick="muda('vitrine',this)">Vitrine</button>
+<button class="tab-btn" onclick="muda('vender',this)">+ Vender Item</button>
+<button class="tab-btn" onclick="muda('carrinho',this)">Carrinho (<span id="cartCount">0</span>)</button>
+<button class="tab-btn" onclick="muda('definicoes',this)">Definicoes</button>
+</nav>
+<main>
+<div id="vitrine" class="tab-content active"><h2>Produtos em Destaque - Mocambique</h2><div class="grid" id="grid"></div></div>
+<div id="vender" class="tab-content"><div class="form"><h2>Cadastrar Novo Item</h2><label>Nome do Produto</label><input id="pNome" placeholder="Ex: Tenis, Telefone, Camera"><label>Preco em MZN</label><input id="pPreco" type="number" placeholder="Ex: 1500"><label>Descricao</label><textarea id="pDesc" rows="3" placeholder="Estado, marca, entrega em Maputo..."></textarea><label>Foto do Produto</label><div class="box"><input type="file" accept="image/*" onchange="preview(event)"><img id="prev"></div><br><button class="btn" style="width:100%;padding:13px" onclick="addProd()">Publicar Produto</button></div></div>
+<div id="carrinho" class="tab-content"><h2>Seu Carrinho</h2><div class="cartbox" id="cartBox"><p style="color:#666">Carrinho vazio.</p></div><br><button class="btn" style="width:100%;padding:13px" onclick="finalizar()">Finalizar Compra no WhatsApp</button></div>
+<div id="definicoes" class="tab-content"><div class="form"><h2>Definicoes</h2><label>Nome da Tua Loja</label><input id="lojaNome" value="Minha Loja Global"><label>Moeda</label><select id="moeda"><option>MZN - Meticais</option><option>USD - Dolar</option><option>EUR - Euro</option></select><label>Teu WhatsApp para receber pedidos (ex: 258840000000)</label><input id="meuZap" placeholder="25884..."><br><br><button class="btn" style="width:100%" onclick="salvar()">Salvar</button></div></div>
+</main><script>
+let foto="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=500&q=80";
+let produtos=[
+{id:1,nome:"Smartwatch Deportivo Pro",preco:2800,desc:"Relogio inteligente a prova dagua, monitor cardiaco. Entrega em Maputo.",img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80",vendedor:"Loja Maputo"},
+{id:2,nome:"Fone Bluetooth Bass Max",preco:1500,desc:"Som estereo, cancelamento de ruido. Novo.",img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80",vendedor:"Loja Beira"},
+{id:3,nome:"Tenis Nike Air Importado",preco:3500,desc:"Tamanho 40-44. Original. Stock limitado.",img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80",vendedor:"Loja Nampula"},
+{id:4,nome:"Telefone Samsung A15",preco:12500,desc:"128GB, dual SIM, caixa selada com garantia.",img:"https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=500&q=80",vendedor:"Loja Maputo"}
+];
+let carrinho=[];
+function toast(m){let t=document.getElementById('toast');t.innerText=m;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
+function muda(id,btn){document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active');}
+function abrirLogin(){document.getElementById('login').style.display='flex';}
+function fecharLogin(){document.getElementById('login').style.display='none';}
+function entrar(){document.getElementById('nomeUser').innerText='Utilizador Google';document.getElementById('avatarUser').src='https://i.pravatar.cc/100?img=12';fecharLogin();toast('Login feito! Bem-vindo!');}
+function preview(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=function(x){foto=x.target.result;let p=document.getElementById('prev');p.src=foto;p.style.display='block';};r.readAsDataURL(f);}
+function mostra(){let g=document.getElementById('grid');g.innerHTML='';produtos.forEach(p=>{g.innerHTML+=`<div class="card"><img src="${p.img}"><div class="body"><b>${p.nome}</b><div class="price">${p.preco} MZN</div><div class="desc">${p.desc}<br><small>Vendedor: ${p.vendedor}</small></div></div><div class="actions"><button class="btn" onclick="addCarrinho(${p.id})">+ Carrinho</button><button class="btn2" onclick="contactar('${p.nome}')">Contactar</button></div></div>`;});}
+function addCarrinho(id){let p=produtos.find(x=>x.id===id);carrinho.push(p);document.getElementById('cartCount').innerText=carrinho.length;mostraCarrinho();toast('Adicionado ao carrinho!');}
+function mostraCarrinho(){let b=document.getElementById('cartBox');if(carrinho.length===0){b.innerHTML='<p style="color:#666">Carrinho vazio.</p>';return;}let total=0;let html='';carrinho.forEach((p,i)=>{total+=p.preco;html+=`<div class="cartItem"><img src="${p.img}"><div style="flex:1"><b>${p.nome}</b><br>${p.preco} MZN</div><button onclick="remover(${i})" style="border:0;background:#ffdddd;padding:6px 10px;border-radius:6px;cursor:pointer">X</button></div>`;});html+=`<h3 style="margin-top:12px">Total: ${total} MZN</h3>`;b.innerHTML=html;}
+function remover(i){carrinho.splice(i,1);document.getElementById('cartCount').innerText=carrinho.length;mostraCarrinho();}
+function contactar(nome){let zap=document.getElementById('meuZap').value||'258840000000';let msg=encodeURIComponent('Ola! Quero o produto: '+nome+' - vi na GlobalMarket MZ');window.open('https://wa.me/'+zap+'?text='+msg,'_blank');}
+function addProd(){let n=document.getElementById('pNome').value;let pr=document.getElementById('pPreco').value;let d=document.getElementById('pDesc').value;if(!n||!pr){alert('Escreve nome e preco!');return;}produtos.unshift({id:Date.now(),nome:n,preco:parseInt(pr),desc:d||'Sem descricao',img:foto,vendedor:document.getElementById('nomeUser').innerText});mostra();document.getElementById('pNome').value='';document.getElementById('pPreco').value='';document.getElementById('pDesc').value='';toast('Produto publicado!');muda('vitrine',document.querySelector('.tab-btn'));}
+function finalizar(){if(carrinho.length===0){alert('Carrinho vazio!');return;}let zap=document.getElementById('meuZap').value||'258840000000';let texto='Ola! Quero comprar na GlobalMarket MZ:%0A';carrinho.forEach(p=>{texto+= '- '+p.nome+' - '+p.preco+' MZN%0A';});window.open('https://wa.me/'+zap+'?text='+texto,'_blank');}
+function salvar(){toast('Definicoes salvas!');}
+mostra();mostraCarrinho();
+</script>
+</body>
+</html>
